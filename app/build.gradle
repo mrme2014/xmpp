@@ -1,0 +1,38 @@
+apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
+
+android {
+    compileSdkVersion project.rootProject.ext.compileSdkVersion as Integer
+    buildToolsVersion project.rootProject.ext.buildToolsVersion as String
+    defaultConfig {
+        applicationId "com.mrs.xmpp.im"
+        minSdkVersion project.rootProject.ext.minSdkVersion as Integer
+        targetSdkVersion project.rootProject.ext.targetSdkVersion as Integer
+        versionCode project.rootProject.ext.versionCode as Integer
+        versionName project.rootProject.ext.versionName as String
+
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.jakewharton:butterknife:8.4.0'
+    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile 'com.android.support:appcompat-v7:' + project.rootProject.ext.appcompat_v7 as String
+    compile 'com.android.support:recyclerview-v7:' + project.rootProject.ext.recyclerview_v7 as String
+
+    compile "org.igniterealtime.smack:smack-android:4.2.0"
+
+    compile "org.igniterealtime.smack:smack-tcp:4.2.0"
+    compile "org.igniterealtime.smack:smack-im:4.2.0"
+    compile "org.igniterealtime.smack:smack-extensions:4.2.0"
+    compile "org.igniterealtime.smack:smack-bosh:4.2.0"
+    compile project(':commlib')
+}

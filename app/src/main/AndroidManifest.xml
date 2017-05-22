@@ -20,6 +20,7 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".im.ChatMsgListActivity"></activity>
         <service android:name=".service.ImService"></service>
     </application>
 

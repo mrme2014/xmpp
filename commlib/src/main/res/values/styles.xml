@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Toolbar样式 -->
+    <style name="ToolBarStyle" parent="Widget.AppCompat.Toolbar">
+        <!-- Toolbar背景颜色 -->
+        <item name="android:background">@color/colorPrimaryDark</item>
+        <!-- Toolbar popup menu样式 -->
+        <item name="android:theme">@style/PopWindowStyle</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/titleBarHeight</item>
+    </style>
+
+
+    <style name="PopWindowStyle" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:colorBackground">@color/colorPrimary</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="overlapAnchor">false</item>
+    </style>
+
+    <declare-styleable name="LoadFrameLayout">
+        <attr name="emptyView" format="reference" />
+        <attr name="errorView" format="reference" />
+        <attr name="loadingView" format="reference" />
+    </declare-styleable>
+</resources>

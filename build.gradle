@@ -33,5 +33,6 @@ ext {
     versionName = '1.0'
     recyclerview_v7 = '23.1.1'
     appcompat_v7 = '23.1.1'
+    support_v4 = '23.1.1'
     xmpp='4.2.0'
 }

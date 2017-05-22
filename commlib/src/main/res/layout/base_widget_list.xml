@@ -1,0 +1,15 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/base_widget_toolbar"></include>
+
+    <com.mrs.xmpp.im.commlib.recyclerview.PullRecycler
+        android:id="@+id/PullRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.mrs.xmpp.im.commlib.recyclerview.PullRecycler>
+</LinearLayout>

@@ -5,8 +5,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
-import com.mrs.xmpp.im.service.ConnManger;
+import com.mrs.xmpp.im.im.ChatMsgListActivity;
 import com.mrs.xmpp.im.service.ImService;
+
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 /**
@@ -18,7 +21,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         startService(new Intent(this, ImService.class));
+    }
+
+    @OnClick(R.id.toChat)
+    public void onViewClicked() {
+        startActivity(new Intent(this, ChatMsgListActivity.class));
     }
 }

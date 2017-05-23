@@ -148,6 +148,7 @@ public class PullRecycler extends FrameLayout implements SwipeRefreshLayout.OnRe
     public void addItemDecoration(RecyclerView.ItemDecoration ItemDecoration) {
         wrapRecyclerView.addItemDecoration(ItemDecoration);
     }
+
     public WrapRecyclerView getRecyclerView() {
         return wrapRecyclerView;
     }

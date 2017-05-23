@@ -20,7 +20,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".im.ChatMsgListActivity"></activity>
+        <activity
+            android:name=".im.ChatMsgListActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden">
+
+        </activity>
+
         <service android:name=".service.ImService"></service>
     </application>
 

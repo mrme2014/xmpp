@@ -7,5 +7,12 @@ import org.jivesoftware.smack.packet.Message;
  */
 
 public class ChatMsg {
+    public int messageType;
     public Message message;
+
+    public ChatMsg(int messageType,Message message){
+        this.message=message;
+        this.message=message;
+    }
+
 }

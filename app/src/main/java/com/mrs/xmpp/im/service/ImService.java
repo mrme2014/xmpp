@@ -48,13 +48,17 @@ public class ImService extends Service implements ConnectionListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        startLoginThread();
+        return START_STICKY;
+    }
+
+    private void startLoginThread() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 login();
             }
         }).start();
-        return START_STICKY;
     }
 
     private void login() {
@@ -165,11 +169,13 @@ public class ImService extends Service implements ConnectionListener {
     @Override
     public void connectionClosed() {
         Log.e("connectionClosed: ", "connectionClosed");
+        startLoginThread();
     }
 
     @Override
     public void connectionClosedOnError(Exception e) {
         Log.e("connectionClosedError: ", e.toString());
+        startLoginThread();
     }
 
     @Override

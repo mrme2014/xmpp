@@ -119,7 +119,7 @@ public abstract class BaseListActivity<T> extends AppCompatActivity implements o
     }
 
     private void setUpToolbar() {
-        mToolbar = (Toolbar) findViewById(R.id.toobar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

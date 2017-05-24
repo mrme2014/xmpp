@@ -6,14 +6,21 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.mrs.xmpp.im.commlib.utils.SdUtils;
+import com.mrs.xmpp.im.entry.ChatMsg;
+import com.mrs.xmpp.im.im.MessageType;
+
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.chat.ChatManagerListener;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
 import org.jivesoftware.smack.chat2.OutgoingChatMessageListener;
+import org.jivesoftware.smack.filter.NotFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
@@ -32,6 +39,7 @@ import org.jxmpp.stringprep.XmppStringprepException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 
 /**
@@ -39,7 +47,7 @@ import java.io.IOException;
  */
 
 public class ImService extends Service implements ConnectionListener {
-    private String userName = "syb", userPwd = "123";
+    private String userName = "syb_2017", userPwd = "123";
 
     @Override
     public void onCreate() {
@@ -63,9 +71,13 @@ public class ImService extends Service implements ConnectionListener {
 
     private void login() {
         XMPPTCPConnection imConn = xmppManager.getInstance().getImConnection();
-        if (imConn == null || imConn.isConnected())
+        if (imConn == null)
             return;
 
+        if (imConn.isConnected() || imConn.isAuthenticated()) {
+            imConn.disconnect();
+            Log.e("login: ", imConn.isConnected() + "---" + imConn.isAuthenticated());
+        }
         try {
             imConn.addConnectionListener(this);
             imConn.connect();
@@ -88,39 +100,25 @@ public class ImService extends Service implements ConnectionListener {
 
     @Override
     public void authenticated(final XMPPConnection connection, boolean resumed) {
+        Log.e("authenticated: ", "authenticated" + "--" + resumed);
         try {
             Stanza stanza = new Presence(Presence.Type.available);
             connection.sendStanza(stanza);
-        } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Log.e("authenticated: ", "authenticated--" + resumed);
-        EntityFullJid jidFull = null;
-        try {
-            jidFull = JidCreate.entityFullFrom("syb_2017@xmpp/Spark");
-        } catch (XmppStringprepException e) {
+        } catch (SmackException.NotConnectedException | InterruptedException e) {
             e.printStackTrace();
         }
 
 
-        ServiceDiscoveryManager sdm = ServiceDiscoveryManager.getInstanceFor(connection);
-        FileTransferManager fileTransferManager = FileTransferManager.getInstanceFor(connection);
-        OutgoingFileTransfer fileTransfer = fileTransferManager.createOutgoingFileTransfer(jidFull);
-        try {
-            File file = new File(Environment.getExternalStorageDirectory() + "/download", "1.png");
-            Log.e("authenticated: ", "file.exists" + file.exists());
-            fileTransfer.sendFile(file, null);
-        } catch (SmackException e) {
-            e.printStackTrace();
-        }
+        FileTransferManager fileTransferManager = xmppManager.getInstance().getFileTransferManager();
         fileTransferManager.addFileTransferListener(new FileTransferListener() {
             @Override
             public void fileTransferRequest(FileTransferRequest request) {
-                IncomingFileTransfer accept = request.accept();
+                Log.e("fileTransferRequest: ", request.getFileName() + "---" + request.getMimeType() + "---" + request.getFileName() + "--" + request.getFileSize());
                 try {
-                    accept.recieveFile(new File(Environment.getExternalStorageDirectory(), request.getFileName()));
+                    File reciveFile = SdUtils.getExternalStorageFile(request.getFileName());
+                    request.accept().recieveFile(reciveFile);
+                    ChatMsg fileMsg = new ChatMsg(MessageType.MESSAGE_IMG, request, reciveFile);
+                    xmppManager.getInstance().dispatchMessages(fileMsg);
                 } catch (SmackException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -129,53 +127,36 @@ public class ImService extends Service implements ConnectionListener {
                 Log.e("fileTransferRequest: ", request.getFileName() + "---" + request.getMimeType() + "---" + request.getFileName() + "--" + request.getFileSize());
             }
         });
+
         ChatManager chatManager = xmppManager.getInstance().getChatManager();
         chatManager.addIncomingListener(new IncomingChatMessageListener() {
             @Override
             public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-                Log.e("New message from ", from + ": " + message.getBody());
-                OfflineMessageManager offlineManager = new OfflineMessageManager(connection);
-                try {
-                    offlineManager.deleteMessages();
-                } catch (SmackException.NoResponseException e) {
-                    e.printStackTrace();
-                } catch (XMPPException.XMPPErrorException e) {
-                    e.printStackTrace();
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ChatMsg txtMsg = new ChatMsg(MessageType.MESSAGE_TXT, message);
+                xmppManager.getInstance().dispatchMessages(txtMsg);
+                Log.e("New message coming ", from + ": " + message.getBody());
             }
         });
+
         chatManager.addOutgoingListener(new OutgoingChatMessageListener() {
             @Override
             public void newOutgoingMessage(EntityBareJid to, Message message, Chat chat) {
                 Log.e("New message go ", to + ": " + message.getBody());
+
             }
+
         });
 
-        EntityBareJid jid = (EntityBareJid) jidFull.asBareJid();
-        Chat chat = chatManager.chatWith(jid);
-        Message message = new Message(jid, Message.Type.chat);
-
-        try {
-            chat.send(message);
-        } catch (SmackException.NotConnectedException | InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
     public void connectionClosed() {
         Log.e("connectionClosed: ", "connectionClosed");
-        startLoginThread();
     }
 
     @Override
     public void connectionClosedOnError(Exception e) {
         Log.e("connectionClosedError: ", e.toString());
-        startLoginThread();
     }
 
     @Override

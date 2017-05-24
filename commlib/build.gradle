@@ -26,4 +26,5 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:' + project.rootProject.ext.recyclerview_v7 as String
     compile 'com.android.support:support-v4:'+ project.rootProject.ext.support_v4 as String
     compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'org.greenrobot:eventbus:3.0.0'
 }
